@@ -52,6 +52,7 @@ echo "--- Bluetooth done"
 
 echo "Other tools"
 apt install gvfs-backends
+apt install mousepad
 echo "done"
 
 echo ""
