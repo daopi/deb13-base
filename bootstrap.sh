@@ -76,6 +76,7 @@ ACTION=="add", SUBSYSTEM=="backlight", RUN+="/bin/chgrp video /sys/class/backlig
 EOF
 usermod -aG video $USERNAME
 apt install -y pkexec
+apt install smbclient
 echo "--- Backlight fix done"
 
 # STEP 10: CHROMIUM
