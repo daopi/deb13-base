@@ -49,7 +49,10 @@ echo "--- Installing Bluetooth..."
 apt install -y bluez blueman
 systemctl enable bluetooth
 echo "--- Bluetooth done"
+
+echo "Other tools"
 apt install gvfs-backends
+echo "done"
 
 echo ""
 echo "=== Install complete ==="
