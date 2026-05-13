@@ -1,72 +1,195 @@
 #!/bin/bash
 
 # =============================================================================
-# Debian 13 (Trixie) - XFCE4 Desktop Install Script
-# =============================================================================
-# HARDWARE:  Lenovo ThinkPad T480s
-# REQUIRES:  bootstrap.sh completed first (sudo, apt no-recommends, updated)
-# RUN AS:    sudo ./xfce4.sh
+
+# Debian 13 (Trixie) - ThinkPad T480s Bootstrap Script
+
 # =============================================================================
 
-set -e
+# GOAL: Minimal Debian install + lean desktop, no bloat
 
-echo "=== XFCE4 Desktop Install for T480s ==="
+# HARDWARE: Lenovo ThinkPad T480s
 
-# STEP 1: DRIVERS
-echo "--- Installing firmware and input drivers..."
-apt install -y firmware-iwlwifi
-apt install -y xserver-xorg-input-libinput
-echo "--- Drivers done"
+# 
 
-# STEP 2: XORG
-echo "--- Installing Xorg..."
-apt install -y xorg xserver-xorg xinit
-echo "--- Xorg done"
+# HOW TO USE:
 
-# STEP 3: XFCE4
-echo "--- Installing XFCE4 core..."
-apt install -y xfce4 xfce4-terminal xfce4-power-manager xfce4-notifyd
-echo "--- XFCE4 done"
+# 1. Install Debian 13 netinstall (deselect ALL in software selection)
 
-# STEP 4: LIGHTDM
-echo "--- Installing LightDM..."
-apt install -y lightdm lightdm-gtk-greeter
-systemctl enable lightdm
-echo "--- LightDM done"
+# - Keep: “standard system utilities”
 
-# STEP 5: PIPEWIRE
-echo "--- Installing PipeWire..."
-apt install -y pipewire pipewire-pulse pipewire-alsa wireplumber pavucontrol
-echo "--- PipeWire done"
+# - Skip: “Debian desktop environment”, blends, everything else
 
-# STEP 6: FONTS
-echo "--- Installing fonts..."
-apt install -y fonts-dejavu-core fonts-liberation
-echo "--- Fonts done"
+# 2. Boot to shell, login as root
 
-# STEP 7: BLUETOOTH
-echo "--- Installing Bluetooth..."
-apt install -y bluez blueman
-systemctl enable bluetooth
-echo "--- Bluetooth done"
+# 3. Run this script as root, or with sudo after step 2 below
 
-echo "Other tools"
-apt install gvfs-backends
-apt install mousepad
-echo "done"
+# 
 
-echo ""
-echo "=== Install complete ==="
-echo ""
-echo "NEXT STEPS:"
-echo "  1. Reboot: sudo reboot"
-echo "  2. LightDM login screen should appear"
-echo "  3. Log in, select XFCE session"
-echo "  4. WiFi: use nm-applet or nmtui in terminal"
-echo "  5. Sound: run pavucontrol to verify PipeWire output"
-echo ""
-echo "OPTIONAL:"
-echo "  apt install network-manager-gnome"
-echo "  apt install thunar"
-echo "  apt install mousepad"
-echo "  apt install gvfs"
+# STATUS: Work in progress - desktop not chosen yet
+
+# =============================================================================
+
+set -e  # Stop on any error
+
+echo “=== Debian 13 T480s Bootstrap ===”
+
+# =============================================================================
+
+# STEP 1: SUDO
+
+# =============================================================================
+
+# Install sudo (not present in minimal install)
+
+# Then add your user to sudo group
+
+# NOTE: Logout and login again after this for sudo to take effect
+
+apt install sudo
+
+# Replace ‘daopi’ with your actual username
+
+USERNAME=“daopi”
+usermod -aG sudo “$USERNAME”
+
+echo “>>> Sudo installed. LOGOUT and LOGIN as $USERNAME before continuing.”
+echo “>>> Then run the rest of this script with sudo.”
+
+# =============================================================================
+
+# STEP 2: APT - NO RECOMMENDS / NO SUGGESTS
+
+# =============================================================================
+
+# This makes ALL future apt installs lean by default
+
+# File: /etc/apt/apt.conf.d/99norecommends
+
+cat > /etc/apt/apt.conf.d/99norecommends << ‘EOF’
+APT::Install-Recommends “false”;
+APT::Install-Suggests “false”;
+EOF
+
+echo “>>> APT configured: no recommends, no suggests”
+
+# =============================================================================
+
+# STEP 3: UPDATE SYSTEM
+
+# =============================================================================
+
+apt update && apt upgrade -y
+
+echo “>>> System updated”
+
+# =============================================================================
+
+# STEP 4: BASE TOOLS (optional but useful)
+
+# =============================================================================
+
+# Uncomment what you want
+
+# apt install git curl wget        # basic download/version control tools
+
+# apt install htop                 # better process monitor than top
+
+# apt install nano vim             # text editors (pick one)
+
+# apt install net-tools            # ifconfig, netstat etc
+
+# apt install bash-completion      # tab completion in bash
+
+# =============================================================================
+
+# STEP 5: DRIVERS - ThinkPad T480s specific
+
+# =============================================================================
+
+# WiFi: Intel 8265 - firmware needed
+
+# Bluetooth: Intel - same firmware package covers it
+
+# Trackpad: works out of box with libinput
+
+# Fingerprint: fprint + fprintd (optional)
+
+# Non-free firmware repo - needed for Intel WiFi
+
+# TODO: check if already enabled in /etc/apt/sources.list
+
+# apt install firmware-iwlwifi     # Intel WiFi + BT firmware
+
+# apt install libinput-tools       # trackpad (usually already present)
+
+# apt install fprintd libfprint-2-tod1  # fingerprint (optional)
+
+# =============================================================================
+
+# STEP 6: DESKTOP ENVIRONMENT
+
+# =============================================================================
+
+# NOT DECIDED YET - options being evaluated:
+
+# 
+
+# MEDIUM WEIGHT (similar to XFCE):
+
+# LXQt  - modern Qt-based, lighter than XFCE
+
+# MATE  - classic GNOME2 feel, rock solid
+
+# Budgie - polished, GTK, moderate weight
+
+# Cinnamon - Windows-like, comfortable
+
+# 
+
+# LIGHT (below XFCE):
+
+# Openbox - mouse-friendly, minimal, X11
+
+# Labwc   - Openbox-like but Wayland
+
+# Sway    - keyboard-driven, Wayland
+
+# 
+
+# INSTALL EXAMPLE (uncomment chosen one):
+
+# apt install xfce4 xfce4-terminal
+
+# apt install lxqt
+
+# apt install mate-desktop-environment-core
+
+# 
+
+# DISPLAY MANAGER (login screen) - pick one:
+
+# apt install lightdm              # lightweight, works with most desktops
+
+# apt install sddm                 # better for LXQt/KDE
+
+# apt install greetd               # minimal, good for Wayland
+
+# =============================================================================
+
+# STEP 7: FONTS & BASIC APPS
+
+# =============================================================================
+
+# Uncomment as needed
+
+# apt install fonts-dejavu-core    # basic fonts
+
+# apt install firefox-esr          # browser
+
+# apt install thunar               # file manager (XFCE’s, works standalone)
+
+# apt install alsa-utils pulseaudio # sound
+
+echo “=== Bootstrap script complete ===”
+echo “Next: choose desktop environment and uncomment STEP 6”
